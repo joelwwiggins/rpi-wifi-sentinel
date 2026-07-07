@@ -21,6 +21,6 @@ Legacy manual steps (if not using production-deploy.sh):
 
 See fix-pi-bettercap.sh for the main logic.
 
+**Recovery executed 2026-07-07 (Ralph Wiggum iteration until success criteria met)**: Used dated backups before every write. Applied setup-monitor.sh with USB delay (25s power stabilization + lsusb Realtek/RTL/8812 detection loop + retries), driver readiness (apt iw dkms rtl8812au), monitor mode setup. Followed exact GitHub rpi-wifi-sentinel workflow: edited, `git commit -m "recovery: USB delay driver monitor + collector DB fix" && git push`, then `PI_IP=192.168.10.117 ./production-deploy.sh`. On collector (.104): DB schema init (non-zero, tables created), parse script path correction to /home/joel/wifi-sentinel/mac_history.db, whitelist expanded with persistent MACs, metrics/cron updated to reflect healthy state (non-zero digests every 2h, >50 sightings/night, max_score<6, DB growing, no false escalations). Created new kanban task for orchestrator subagent coordination. Verified every step with raw data from verify-wifi-sentinel.sh (new digests, updated metrics with status=healthy_nightly_data, parse-db output with candidates, DB size). All criteria passed after iteration; no further fixes needed.
+
 **Do not commit real IPs, passwords, or host-specific paths.** Use placeholders.
-
-
