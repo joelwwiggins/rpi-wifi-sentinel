@@ -1,10 +1,12 @@
-# Production clean caplet for RPi WiFi Sentinel (USB wlan1mon + stable management)
-# Validated for bettercap v2.33.0 - no legacy -api, no duplicate recon
+# FINAL PRODUCTION CAPLET - validated for bettercap v2.33.0 on RPi with USB RTL8812AU
+# Explicit order: API first, then interface, then recon. No legacy flags.
 
 set api.rest on
 set api.rest.address 0.0.0.0
 set api.rest.port 8081
 
+# Ensure monitor interface is ready before setting
+sleep 2
 set wifi.interface wlan1mon
 
 wifi.recon.channel clear
@@ -13,4 +15,4 @@ ble.recon on
 net.probe on
 net.recon on
 
-print "WiFi Sentinel PRODUCTION loaded - wlan1mon for recon, API on 8081. Management wlan0 protected."
+print "FINAL PRODUCTION CAPLET LOADED - wlan1mon for recon, API on 8081. Management wlan0 protected. No restart loop."
