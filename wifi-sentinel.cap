@@ -1,0 +1,20 @@
+# Clean WiFi Sentinel caplet - USB monitor (wlan1mon) + stable management (wlan0)
+# No legacy -api flag. Use api.rest on only.
+
+set api.rest on
+set api.rest.address 0.0.0.0
+set api.rest.port 8081
+
+# Use wlan1mon for recon when available
+set wifi.interface wlan1mon
+
+# Recon settings
+wifi.recon.channel clear
+ble.recon on
+net.probe on
+net.recon on
+
+# Explicitly enable WiFi recon on monitor interface
+wifi.recon on
+
+print "WiFi Sentinel clean config loaded - wlan1mon for recon, API on 8081"
