@@ -12,11 +12,12 @@ Reusable setup for Raspberry Pi with USB WiFi adapter (RTL8812AU) for monitoring
 - Watchers for boot-race recovery.
 
 ## Setup
-1. Copy files to ~/wifi-sentinel on target Pi.
-2. Edit PI_IP and other variables in scripts.
-3. sudo cp bettercap.service /etc/systemd/system/
-4. sudo systemctl daemon-reload && sudo systemctl enable --now bettercap.service
-5. For driver: sudo apt install realtek-rtl88xxau-dkms (or build 8812au driver).
+1. Clone `https://github.com/joelwwiggins/rpi-wifi-sentinel` and set `PI_IP` (default `192.168.10.117`).
+2. From the repo on the Orin (or jump host): `./production-deploy.sh` — syncs caplets, unit, and scripts to the Pi and restarts bettercap.
+3. On the Orin: `~/.config/systemd/user/wifi-sentinel.service` runs `wifi_sentinel.py` (collector polls Pi `:8081`).
+4. After deploy: `./force-fresh-digest.sh` or wait for the collector cycle; cron `cf25a20f0e00` watches digests.
+
+Legacy manual steps (if not using production-deploy.sh):
 
 See fix-pi-bettercap.sh for the main logic.
 

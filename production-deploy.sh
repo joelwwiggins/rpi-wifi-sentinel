@@ -3,18 +3,21 @@
 PI_IP="${PI_IP:-192.168.10.117}"
 echo "=== FINAL PRODUCTION DEPLOYMENT to $PI_IP (garage node) - $(date) ==="
 
-scp -o StrictHostKeyChecking=no wifi-sentinel.cap bettercap.service.template fix-pi-bettercap.sh joel@$PI_IP:~/wifi-sentinel/
+scp -o StrictHostKeyChecking=no \
+  wifi-sentinel.cap wifi-sentinel.cap.good bettercap.service.template \
+  fix-pi-bettercap.sh setup-monitor.sh \
+  joel@$PI_IP:~/wifi-sentinel/
 
 ssh -o StrictHostKeyChecking=no joel@$PI_IP '
 cd ~/wifi-sentinel
 echo "Cleaning old state..."
 sudo systemctl stop bettercap.service
 sudo rm -f /var/lib/bettercap/* 2>/dev/null || true
-sudo rm -f wifi-sentinel.cap* 2>/dev/null || true
+# Do not delete wifi-sentinel.cap* — artifacts were just synced from the GitHub repo
 
-echo "Deploying minimal production caplet..."
-cp wifi-sentinel.cap wifi-sentinel.cap.good
-sudo cp wifi-sentinel.cap.good wifi-sentinel.cap
+echo "Deploying production caplet from repo (cap.good canonical)..."
+chmod +x fix-pi-bettercap.sh setup-monitor.sh
+./fix-pi-bettercap.sh --no-start || true
 
 echo "Deploying unit with API forced early..."
 sudo cp bettercap.service.template /etc/systemd/system/bettercap.service

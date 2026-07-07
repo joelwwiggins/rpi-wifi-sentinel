@@ -19,13 +19,24 @@ else
   TARGET_IFACE="wlan0"
 fi
 
-# Deploy clean production caplet
-cp wifi-sentinel.cap.good wifi-sentinel.cap
+# Deploy clean production caplet (cap.good is canonical in repo; fall back to wifi-sentinel.cap)
+CAP_SRC="wifi-sentinel.cap.good"
+if [ ! -f "$CAP_SRC" ]; then
+  echo "WARN: $CAP_SRC missing — using wifi-sentinel.cap from deploy" | tee -a $LOG
+  CAP_SRC="wifi-sentinel.cap"
+fi
+cp "$CAP_SRC" wifi-sentinel.cap
 sed -i "s|set wifi.interface .*|set wifi.interface $TARGET_IFACE|" wifi-sentinel.cap
-sed -i "1i set api.rest on\nset api.rest.address 0.0.0.0\nset api.rest.port 8081" wifi-sentinel.cap
 
-# Disable recon on management interface to protect link
-if [ "$TARGET_IFACE" = "wlan0" ]; then
+# Ensure API lines exist (dedupe-safe: prepend only if port line absent)
+if ! grep -q 'api.rest.port 8081' wifi-sentinel.cap; then
+  sed -i "1i set api.rest on\nset api.rest.address 0.0.0.0\nset api.rest.port 8081" wifi-sentinel.cap
+fi
+
+if [ "$TARGET_IFACE" = "wlan1mon" ]; then
+  sed -i "s|^# wifi.recon on.*|wifi.recon on|" wifi-sentinel.cap
+  sed -i "s|^# wifi.probe on.*|wifi.probe on|" wifi-sentinel.cap
+elif [ "$TARGET_IFACE" = "wlan0" ]; then
   sed -i "s|^wifi.recon on|# wifi.recon on (disabled on wlan0 to prevent link drop)|" wifi-sentinel.cap
   sed -i "s|^wifi.probe on|# wifi.probe on (disabled on wlan0 to prevent link drop)|" wifi-sentinel.cap
 fi
