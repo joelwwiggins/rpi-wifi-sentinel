@@ -1,8 +1,11 @@
-# BARE PRODUCTION CAPLET - only API. No recon lines, no interface set in caplet.
-# This is the minimal version to eliminate all parsing errors in v2.33.0.
+# MINIMAL FINAL PRODUCTION CAPLET - API only. No print line, no complex strings. Interface set via command line.
 
 set api.rest on
 set api.rest.address 0.0.0.0
 set api.rest.port 8081
 
-print "BARE PRODUCTION CAPLET LOADED - API only. Recon and interface set via command line. Garage data should now flow."
+wifi.recon.channel clear
+wifi.recon on
+ble.recon on
+net.probe on
+net.recon on
