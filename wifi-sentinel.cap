@@ -1,5 +1,5 @@
-# MINIMAL PRODUCTION CAPLET - only API and recon settings. Interface is set on command line (-iface wlan1mon).
-# This eliminates "wifi.interface not set or not found" error in v2.33.0.
+# FINAL PRODUCTION CAPLET - Minimal for v2.33.0 on RPi with USB RTL8812AU in garage
+# Interface is set via command line (-iface wlan1mon). No set wifi.interface in caplet to avoid "not set or not found" error.
 
 set api.rest on
 set api.rest.address 0.0.0.0
@@ -11,4 +11,4 @@ ble.recon on
 net.probe on
 net.recon on
 
-print "MINIMAL PRODUCTION CAPLET LOADED - wlan1mon set via command line. API on 8081. Garage monitoring active."
+print "FINAL PRODUCTION CAPLET LOADED - wlan1mon set via command line. API on 8081. Garage monitoring active. No restart loop."
