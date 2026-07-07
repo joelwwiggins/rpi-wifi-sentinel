@@ -1,11 +1,3 @@
-# MINIMAL FINAL PRODUCTION CAPLET - API only. No print line, no complex strings. Interface set via command line.
-
 set api.rest on
 set api.rest.address 0.0.0.0
 set api.rest.port 8081
-
-wifi.recon.channel clear
-wifi.recon on
-ble.recon on
-net.probe on
-net.recon on
