@@ -1,13 +1,9 @@
-# FINAL PRODUCTION CAPLET - validated for bettercap v2.33.0 on RPi with USB RTL8812AU
-# Explicit order: API first, then interface, then recon. No legacy flags.
+# MINIMAL PRODUCTION CAPLET - only API and recon settings. Interface is set on command line (-iface wlan1mon).
+# This eliminates "wifi.interface not set or not found" error in v2.33.0.
 
 set api.rest on
 set api.rest.address 0.0.0.0
 set api.rest.port 8081
-
-# Ensure monitor interface is ready before setting
-sleep 2
-set wifi.interface wlan1mon
 
 wifi.recon.channel clear
 wifi.recon on
@@ -15,4 +11,4 @@ ble.recon on
 net.probe on
 net.recon on
 
-print "FINAL PRODUCTION CAPLET LOADED - wlan1mon for recon, API on 8081. Management wlan0 protected. No restart loop."
+print "MINIMAL PRODUCTION CAPLET LOADED - wlan1mon set via command line. API on 8081. Garage monitoring active."
