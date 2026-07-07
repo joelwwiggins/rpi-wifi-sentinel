@@ -1,5 +1,5 @@
 [Unit]
-Description=bettercap WiFi Sentinel (USB monitor active)
+Description=bettercap WiFi Sentinel (production - USB wlan1mon, API forced)
 After=network-online.target NetworkManager.service
 Wants=network-online.target
 [Service]
@@ -7,10 +7,10 @@ Type=simple
 User=root
 WorkingDirectory=/home/joel/wifi-sentinel
 ExecStartPre=/home/joel/wifi-sentinel/fix-pi-bettercap.sh --no-start
-ExecStart=/usr/bin/bettercap -iface wlan1mon -caplet /home/joel/wifi-sentinel/wifi-sentinel.cap --no-colors
+ExecStart=/usr/bin/bettercap -iface wlan1mon -caplet /home/joel/wifi-sentinel/wifi-sentinel.cap --no-colors -eval "api.rest on; api.rest.address 0.0.0.0; api.rest.port 8081"
 Restart=always
 RestartSec=8
-TimeoutStartSec=45
+TimeoutStartSec=60
 StandardOutput=journal
 StandardError=journal
 [Install]
