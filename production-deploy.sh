@@ -1,38 +1,6 @@
 #!/bin/bash
-# FINAL PRODUCTION DEPLOYMENT - clean stop, rm any cached caplet, force minimal caplet, restart with API forced early
-PI_IP="${PI_IP:-192.168.10.117}"
-echo "=== FINAL PRODUCTION DEPLOYMENT to $PI_IP (garage node) - $(date) ==="
-
-scp -o StrictHostKeyChecking=no \
-  wifi-sentinel.cap wifi-sentinel.cap.good bettercap.service.template \
-  fix-pi-bettercap.sh setup-monitor.sh \
-  joel@$PI_IP:~/wifi-sentinel/
-
-ssh -o StrictHostKeyChecking=no joel@$PI_IP '
-cd ~/wifi-sentinel
-echo "Cleaning old state..."
-sudo systemctl stop bettercap.service
-sudo rm -f /var/lib/bettercap/* 2>/dev/null || true
-# Do not delete wifi-sentinel.cap* — artifacts were just synced from the GitHub repo
-
-echo "Deploying production caplet from repo (cap.good canonical)..."
-chmod +x fix-pi-bettercap.sh setup-monitor.sh
-./fix-pi-bettercap.sh --no-start || true
-
-echo "Deploying unit with API forced early..."
-sudo cp bettercap.service.template /etc/systemd/system/bettercap.service
-sudo systemctl daemon-reload
-sudo systemctl start bettercap.service
-sleep 12
-
-echo "=== FINAL PRODUCTION STATUS ==="
-systemctl is-active bettercap.service
-ps aux | grep -o "bettercap.*iface.*"
-echo "Port 8081 listening on 0.0.0.0?"
-ss -tlnp | grep 8081
-echo "API test (expect valid JSON with garage data):"
-curl -s --max-time 15 http://127.0.0.1:8081/api/session | head -c 400 || echo "Code: $(curl -s -o /dev/null -w "%{http_code}" --max-time 15 http://127.0.0.1:8081/api/session)"
-echo "Journal (last 15 lines - should be clean):"
-journalctl -u bettercap.service -n 15 --no-pager
-'
-echo "Final production deployment complete. The API should now be responding with fresh garage data. Run ./force-fresh-digest.sh to update alerts."
+PI_IP=${PI_IP:-192.168.10.117}
+echo "Deploying to RPi at $PI_IP with 35s USB power delay for RTL8812AU"
+scp setup-monitor.sh pi@$PI_IP:/home/pi/
+ssh pi@$PI_IP "chmod +x /home/pi/setup-monitor.sh && sudo cp /home/pi/setup-monitor.sh /usr/local/bin/ && sudo systemctl restart wifi-sentinel || echo 'Service restart failed - check journal'"
+echo "Deployment complete. Monitor with: ssh pi@$PI_IP \"journalctl -u wifi-sentinel -f\""

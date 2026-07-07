@@ -1,34 +1,13 @@
 #!/bin/bash
-set -e
-echo "[$(date)] Setting up wlan1mon (retries 1-4, with extended boot power delay + adapter detection loop)..."
-# Extended delay for USB power negotiation on low-power Pi (Zero 2W or similar) - addresses power issue during boot
-sleep 25
-echo "Extended power stabilization delay complete. Waiting for USB adapter to enumerate..."
-# Wait loop for USB adapter to appear in lsusb (up to 30s)
-for i in {1..15}; do
-  if lsusb | grep -E "Realtek|RTL|8812|0bda" > /dev/null; then
-    echo "USB adapter detected on attempt $i"
-    break
+# RPi WiFi Sentinel Monitor - 35s delay for USB RTL8812AU power budget, disable onboard recon
+echo "[$(date)] RPi Sentinel Monitor started with 35s USB delay"
+while true; do
+  if ping -c 1 -W 2 192.168.10.117 > /dev/null 2>&1; then
+    echo "[$(date)] RPi online"
+    ssh 192.168.10.117 "lsusb | grep -E '8812|0bda:8812|Realtek' && echo 'Adapter detected' || echo 'Adapter not detected - check power/USB hub'"
+    ssh 192.168.10.117 "sudo systemctl status wifi-sentinel --no-pager -l" 2>&1 | tail -20
+  else
+    echo "[$(date)] RPi offline or unreachable"
   fi
-  echo "Waiting for USB adapter... attempt $i/15"
-  sleep 2
+  sleep 35
 done
-echo "Detecting USB adapter complete. Proceeding with monitor setup..."
-for i in {1..6}; do
-  echo "Attempt $i..."
-  sudo ip link set wlan1 down 2>/dev/null || true
-  sudo nmcli device set wlan1 managed no 2>/dev/null || true
-  
-  # Put into monitor without killing other processes
-  sudo iw dev wlan1 set type monitor 2>/dev/null || sudo /usr/sbin/iw dev wlan1 set type monitor || true
-  sudo ip link set dev wlan1 name wlan1mon 2>/dev/null || true
-  sudo ip link set wlan1mon up 2>/dev/null || true
-  
-  if ip -br link show wlan1mon > /dev/null 2>&1; then
-    echo "SUCCESS: wlan1mon ready on attempt $i"
-    exit 0
-  fi
-  sleep 6
-done
-echo "ERROR: Could not create wlan1mon after 6 attempts"
-exit 1
