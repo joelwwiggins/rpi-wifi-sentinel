@@ -1,0 +1,38 @@
+set api.rest on
+# Clean known-good caplet for RPi Zero 2W
+# wlan0 = management interface (keep connected to ORBI54 for SSH/network)
+# wlan1mon = dedicated monitor interface from USB adapter for recon only
+# API enabled for Jetson wifi_sentinel.py collector
+
+set interactive false
+
+# Do not touch wlan0 - it is the management interface
+# Recon uses the monitor interface only
+
+set wifi.interface wlan0
+# wifi.recon on (disabled to protect management link)
+ble.recon on
+
+net.probe on
+net.recon on
+# wifi.probe on (disabled to protect management link)  # enables better capture of client probe requests (phones looking for WiFi names/SSIDs)
+
+# Explicitly log probe events for collector to pick SSIDs
+set events.stream on
+events.show 0
+
+# Logging and events (light)
+events.stream on
+set events.stream.output /home/joel/wifi-sentinel/logs/events.log
+set wifi.handshakes.file /home/joel/wifi-sentinel/handshakes/wifi-handshakes.pcap
+
+# API REST - enabled early and cleanly for collector
+set api.rest.address 0.0.0.0
+set api.rest.port 8081
+api.rest on
+
+# Ticker for visibility
+set ticker.period 60
+set ticker.commands "wifi.show; ble.show; net.show; events.show 3"
+
+print "WiFi Sentinel clean config loaded - wlan1mon for recon, API on 8081"

@@ -1,0 +1,17 @@
+[Unit]
+Description=bettercap WiFi Sentinel (USB monitor active)
+After=network-online.target NetworkManager.service
+Wants=network-online.target
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/home/joel/wifi-sentinel
+ExecStartPre=/home/joel/wifi-sentinel/fix-pi-bettercap.sh --no-start
+ExecStart=/usr/bin/bettercap -iface wlan1mon -caplet /home/joel/wifi-sentinel/wifi-sentinel.cap --no-colors
+Restart=always
+RestartSec=8
+TimeoutStartSec=45
+StandardOutput=journal
+StandardError=journal
+[Install]
+WantedBy=multi-user.target
